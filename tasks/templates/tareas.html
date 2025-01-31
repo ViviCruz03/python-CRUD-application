@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Tareas</h1>
+<ul>
+    {% for tarea in tareas %}
+    <li>
+        <a href="{% url 'detalle_tarea' tarea.id %}">
+        {% if tarea.important %}
+        <strong>{{tarea.title}}</strong>
+        {% else %}
+        {{tarea.title}}
+        {% endif %}
+        <p>{{tarea.description}}</p>
+        <p>Usuario: {{tarea.user}}</p>
+        </a>
+        
+    </li>
+    {% endfor %}
+</ul>
+
+
+{% endblock %}
