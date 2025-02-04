@@ -8,6 +8,7 @@ from django.db import IntegrityError
 from .forms import TareaForm
 from .models import Tarea
 from django.utils import timezone
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -42,14 +43,17 @@ def signup(request):
             "error": 'Las contraseñas no coinciden'
         })
 
+@login_required
 def tareas(request):
     tareas = Tarea.objects.filter(user=request.user, datecompleted__isnull=True)
     return render(request, 'tareas.html',{'tareas':tareas})
 
+@login_required
 def tareas_completadas(request):
     tareas = Tarea.objects.filter(user=request.user, datecompleted__isnull=False).order_by ('-datecompleted')
     return render(request, 'tareas.html',{'tareas':tareas})
 
+@login_required
 def create_task(request):
     if request.method =='GET':
         return render(request, 'crear_tarea.html',{'form': TareaForm })
@@ -66,6 +70,7 @@ def create_task(request):
                 "error": "Error al crear la tarea"
             })
 
+@login_required
 def tarea_detalle(request, tarea_id):
     if request.method == 'GET':
         # Obtiene la tarea o lanza un error 404 si no existe
@@ -81,6 +86,7 @@ def tarea_detalle(request, tarea_id):
         except ValueError:
             return render (request, 'detales_tarea.html', {'tarea':tarea, 'form': form, 'error':"Error al actualizar la tarea"})
 
+@login_required
 def signout(request):
     logout(request)
     return redirect('home')
@@ -103,6 +109,7 @@ def signin(request):
             login(request, user)
             return redirect('tareas')
 
+@login_required
 def completar_tarea(request, tarea_id):
     tarea=get_object_or_404(Tarea, pk=tarea_id, user=request.user)
     if request.method =='POST':
@@ -110,7 +117,7 @@ def completar_tarea(request, tarea_id):
         tarea.save()
         return redirect(tareas)
 
-
+@login_required
 def eliminar_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, pk=tarea_id, user=request.user)
     if request.method == 'POST':
