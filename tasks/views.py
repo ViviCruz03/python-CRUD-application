@@ -46,6 +46,10 @@ def tareas(request):
     tareas = Tarea.objects.filter(user=request.user, datecompleted__isnull=True)
     return render(request, 'tareas.html',{'tareas':tareas})
 
+def tareas_completadas(request):
+    tareas = Tarea.objects.filter(user=request.user, datecompleted__isnull=False).order_by ('-datecompleted')
+    return render(request, 'tareas.html',{'tareas':tareas})
+
 def create_task(request):
     if request.method =='GET':
         return render(request, 'crear_tarea.html',{'form': TareaForm })
