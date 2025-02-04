@@ -5,12 +5,22 @@
 <h1>Detalles de la tarea</h1>
 <p>{{tarea.title}}</p>
 
+{{error}}
+
 <form method="POST">
     {% csrf_token %}
     {{form.as_p}}
     <button>
         Actualizar
     </button>
+</form>
+
+<form action="{% url 'completar_tarea' tarea.id %}" method="POST">
+  {% csrf_token %}
+  <button>
+    Completar
+  </button>
+
 </form>
 
 <form action="{% url 'eliminar_tarea' tarea.id %}" method="POST">

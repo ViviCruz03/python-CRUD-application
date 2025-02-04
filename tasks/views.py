@@ -7,6 +7,7 @@ from django.contrib.auth import login, logout, authenticate
 from django.db import IntegrityError
 from .forms import TareaForm
 from .models import Tarea
+from django.utils import timezone
 
 # Create your views here.
 
@@ -68,10 +69,13 @@ def tarea_detalle(request, tarea_id):
         form= TareaForm(instance=tarea)
         return render(request, 'detalles_tarea.html', {'tarea': tarea, 'form': form})    
     else:
-        tarea= get_object_or_404(Tarea, pk=tarea_id)
-        form = TareaForm(request.POST, instance=tarea)
-        form.save()
-        return redirect('tareas')
+        try:
+            tarea= get_object_or_404(Tarea, pk=tarea_id, user=request.user)
+            form = TareaForm(request.POST, instance=tarea)
+            form.save()
+            return redirect('tareas')
+        except ValueError:
+            return render (request, 'detales_tarea.html', {'tarea':tarea, 'form': form, 'error':"Error al actualizar la tarea"})
 
 def signout(request):
     logout(request)
@@ -94,6 +98,14 @@ def signin(request):
         else:
             login(request, user)
             return redirect('tareas')
+
+def completar_tarea(request, tarea_id):
+    tarea=get_object_or_404(Tarea, pk=tarea_id, user=request.user)
+    if request.method =='POST':
+        tarea.datecompleted =timezone.now()
+        tarea.save()
+        return redirect(tareas)
+
 
 def eliminar_tarea(request, tarea_id):
     tarea = get_object_or_404(Tarea, pk=tarea_id, user=request.user)
